@@ -1,10 +1,10 @@
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
+import pytest
+
 from hledger_python_lib.hledger import LedgerFile
 
 
-def test_initialization():
-    with NamedTemporaryFile() as tf:
-        path_to_ledger = Path(str(tf.name))
-        ledger = LedgerFile(path_to_ledger)
+def test_initialization(random_hledger_csv):
+    uut = LedgerFile(random_hledger_csv)
