@@ -1,5 +1,18 @@
-from typing import Protocol
-from datetime import datetime
+from typing import Literal, Protocol, Self
+from datetime import date, datetime
+
+type HLEDGER_STD_REPORTS = Literal[
+    "print",
+    "aregister",
+    "register",
+    "balancesheet",
+    "balancesheetequity",
+    "cashflow",
+    "incomestatement",
+]
+
+type HLEDGER_BASIC_REPORTS = Literal["accounts", "commodities", "files"]
+type HLEDGER_OUTPUTS = Literal["csv", "json"]
 
 
 class Transaction(Protocol):
@@ -14,6 +27,20 @@ class Account(Protocol):
 
 
 class LedgerFile(Protocol):
-    async def get_accounts_names(self) -> list[str]: ...
     async def get_accounts(self) -> list[Account]: ...
     async def get_account(self, acct_name: str) -> Account: ...
+
+
+class HledgerCommand(Protocol):
+    async def execute(self) -> tuple[bytes, bytes]: ...
+
+
+class HledgerCommandBuilder(Protocol):
+    def with_file(self) -> Self: ...
+    def with_std_report(self, report: HLEDGER_STD_REPORTS) -> Self: ...
+    def with_basic_report(self, report: HLEDGER_BASIC_REPORTS) -> Self: ...
+    def with_start_date(self, date: date) -> Self: ...
+    def with_end_date(self, date: date) -> Self: ...
+    def with_account(self, account: str) -> Self: ...
+    def with_output(self, output: HLEDGER_OUTPUTS) -> Self: ...
+    def build(self) -> HledgerCommand: ...
